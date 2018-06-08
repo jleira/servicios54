@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Tymon\JWTAuth\JWTAuth;
 use Auth;
 use DB;
+use Carbon\Carbon;
 
 class FinderController extends Controller
 {
@@ -41,16 +42,17 @@ class FinderController extends Controller
     public function mascotas(Request $request)
     {
         $clave=$request->clave;
+        $vender=$request->vender;
         $arrayexplode=explode(' ',$clave);
          $results=DB::table('mascotas')->where(
-            function ($query) use($arrayexplode) {
+            function ($query) use($arrayexplode,$vender) {
                 for ($i = 0; $i < count($arrayexplode); $i++){
-                   $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id_usuario', [Auth::user()->id])->where('vender',1);
+                   $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id_usuario', [Auth::user()->id])->whereIn('vender',$vender);
                 } 
            }
-         )->orWhere( function ($query) use($arrayexplode) {
+         )->orWhere( function ($query) use($arrayexplode, $vender) {
             for ($i = 0; $i < count($arrayexplode); $i++){
-               $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id', [Auth::user()->id])->where('vender',1);
+               $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id_usuario', [Auth::user()->id])->whereIn('vender',$vender);
             } 
        })->get();
        $datos['datos']=$results;
@@ -58,37 +60,112 @@ class FinderController extends Controller
      
     }
 
-    public function nuevacategoria(Request $request)
+    public function mascotas2(Request $request)
     {
-    $this->validate($request, [
-            'nombre' => 'required',
-    ]);
-    $validador=DB::table('categorias')->where('id_empresa',Auth::user()->id_empresa)->where('nombre',$request->nombre)->first();
-        if(($validador)){
-            $this->validate($request, [
-                'nombre' => 'required|unique:categorias,nombre',
-        ]);
-    
-       }
-       if(!$request->has('descripcion')){
-        $request->descripcion="";
-       }
-       if(!$request->has('referencia')){
-        $request->referencia="";
-       }
-       $categoriaid = DB::table('categorias')->where('id_empresa',Auth::user()->id_empresa)->max('id_categoria');
-
-       DB::table('categorias')->insert(
-        [
-        'id_empresa' => Auth::user()->id_empresa,
-        'id_categoria' => $categoriaid+1, 
-        'nombre' => $request->nombre,
-        'referencia' => $request->referencia,
-        'descripcion'=> $request->descripcion        
-        ]
-    );
-    return response('Categoria creada exitosamente',200);
+        $clave=$request->clave;
+        $vender=$request->vender;
+        $arrayexplode=explode(' ',$clave);
+         $results=DB::table('mascotas')->where(
+            function ($query) use($arrayexplode,$vender) {
+                for ($i = 0; $i < count($arrayexplode); $i++){
+                   $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('vender',$vender);
+                } 
+           }
+         )->orWhere( function ($query) use($arrayexplode, $vender) {
+            for ($i = 0; $i < count($arrayexplode); $i++){
+               $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('vender',$vender);
+            } 
+       })->get();
+       $datos['datos']=$results;
+         return response($datos,200);      
     }
+public function guardaraccesorio(Request $request)
+{
+    $this->validate($request, [
+        'nombre' => 'required',
+        'categoria' => 'required',
+        'precio'=>'required',
+        'descripcion'=>'present'
+    ]);
+
+    $fecha=carbon::now('America/Bogota')->toDateTimeString();
+
+DB::table('productos')->insert(
+    [
+    'usuario_id' => Auth::user()->id,
+    'nombre' => $request->nombre, 
+    'categoria' => $request->categoria,
+    'precio'=> $request->precio,
+    'descripcion'=>$request->descripcion,
+    'creado'=>$fecha
+    ]
+);
+$productonuevo=DB::table('productos')->where('id',DB::table('productos')->where('usuario_id',Auth::user()->id)->max('id'))->take(1)->get();
+return response($productonuevo,200);
+        
+
+}
+
+public function accesoriosyservicios(Request $request)
+{
+    $clave=$request->clave;
+    $categoria=$request->categoria;
+    $arrayexplode=explode(' ',$clave);
+     $results=DB::table('productos')->crossJoin('users', function ($join) {
+        $join->on('productos.usuario_id', '=', 'users.id');
+    })->where(
+        function ($query) use($arrayexplode, $categoria) {
+            for ($i = 0; $i < count($arrayexplode); $i++){
+               $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('usuario_id', [Auth::user()->id])->whereIn('categoria',$categoria);
+            } 
+       }
+     )->orWhere( function ($query) use($arrayexplode,$categoria) {
+        for ($i = 0; $i < count($arrayexplode); $i++){
+           $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('usuario_id', [Auth::user()->id])->whereIn('categoria',$categoria);
+        } 
+   })->select('productos.nombre','users.first_name','users.last_name','productos.categoria','productos.precio','productos.descripcion')->get();
+   $datos['datos']=$results;
+     return response($datos,200); 
+ 
+}
+
+public function accesoriosyservicios2(Request $request)
+{
+    $clave=$request->clave;
+    $categoria=$request->categoria;
+    $arrayexplode=explode(' ',$clave);
+     $results=DB::table('productos')->crossJoin('users', function ($join) {
+        $join->on('productos.usuario_id', '=', 'users.id');
+    })->where(
+        function ($query) use($arrayexplode, $categoria) {
+            for ($i = 0; $i < count($arrayexplode); $i++){
+               $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('categoria',$categoria);
+            } 
+       }
+     )->orWhere( function ($query) use($arrayexplode,$categoria) {
+        for ($i = 0; $i < count($arrayexplode); $i++){
+           $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('categoria',$categoria);
+        } 
+   })->select('productos.*','users.first_name','users.last_name')->get();
+   $datos['datos']=$results;
+     return response($datos,200); 
+ 
+}
+
+public function misaccesorios($id)
+{
+    if($id==0){
+        $id=Auth::user()->id;
+    }
+        return response(DB::table('productos')->where('usuario_id',$id)->get(),200);  
+}
+
+public function prueba(){
+    $users = DB::table('users')
+            ->crossJoin('mensajes')
+            ->get();
+    return response($users);
+}
 
     //
 }

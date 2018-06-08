@@ -54,7 +54,7 @@ public function crearmascota(Request $request)
         'precio'=>$request->precio
             ]
         ); 
-        $macotanueva=DB::table('mascotas')->where('id',DB::table('mascotas')->where('id_usuario',Auth::user()->id)->max('id'))->get();
+        $macotanueva=DB::table('mascotas')->where('id',DB::table('mascotas')->where('id_usuario',Auth::user()->id)->max('id'))->take(1)->get();
         return response($macotanueva,200);
 }
 public function mismascotas($id)

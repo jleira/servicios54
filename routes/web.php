@@ -27,6 +27,12 @@ $app->get('/key', function() {
 $app->post('api/auth/login', 'AuthController@login');
 $app->get('api/empresasactivas','ExampleController@empresasactivas');
 $app->post('api/auth/register','AuthController@register');
+$app->post('/api/find/mascotas2', 'FinderController@mascotas2');    
+$app->post('/api/find/accesoriosyservicios2', 'FinderController@accesoriosyservicios2');
+
+$app->post('/api/upload/files', 'UploadfileController@prueba');    
+
+
 
 
 //GRoup with protection to login users.
@@ -52,8 +58,12 @@ $app->group(['middleware' => 'auth:api'], function($app)
     
     $app->get('/api/chat/mensajes/{recibe}', 'ChatController@mensajes');
     $app->post('/api/chat/mensajes/guardar', 'ChatController@insertmsj');
+    $app->post('/api/guardar/accesorios', 'FinderController@guardaraccesorio');
+    $app->post('/api/find/misaccesorios', 'FinderController@accesoriosyservicios');
+    $app->get ('/api/find/misaccesorios/{id}', 'FinderController@misaccesorios');    
+    $app->get('/api/find/accesorios2', 'FinderController@prueba');
     
-
+//    http://167.114.185.216/servicios54/public//api/find/accesorios
 //   $app->get('/api-material-categorias', 'CategoriaController@prueba');
 
 });

@@ -19,25 +19,6 @@ class ChatController extends Controller
     {
         //
     }
-        public function people(Request $request)
-    {
-        $clave=$request->clave;
-        $arrayexplode=explode(' ',$clave);
-         $results=DB::table('users')->select('id','first_name', 'last_name')->where(
-            function ($query) use($arrayexplode) {
-                for ($i = 0; $i < count($arrayexplode); $i++){
-                   $query->orwhere('first_name', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id', [Auth::user()->id]);
-                } 
-           }
-         )->orWhere( function ($query) use($arrayexplode) {
-            for ($i = 0; $i < count($arrayexplode); $i++){
-               $query->orwhere('last_name', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id', [Auth::user()->id]);
-            } 
-       })->get();
-       $datos['datos']=$results;
-         return response($datos,200); 
-     
-    }
 
     public function mensajes($recibe)
     {
@@ -72,39 +53,6 @@ class ChatController extends Controller
     );
             
     return response('mensaje guardado',200);
-    }
-
-
-    public function nuevacategoria(Request $request)
-    {
-    $this->validate($request, [
-            'nombre' => 'required',
-    ]);
-    $validador=DB::table('categorias')->where('id_empresa',Auth::user()->id_empresa)->where('nombre',$request->nombre)->first();
-        if(($validador)){
-            $this->validate($request, [
-                'nombre' => 'required|unique:categorias,nombre',
-        ]);
-    
-       }
-       if(!$request->has('descripcion')){
-        $request->descripcion="";
-       }
-       if(!$request->has('referencia')){
-        $request->referencia="";
-       }
-       $categoriaid = DB::table('categorias')->where('id_empresa',Auth::user()->id_empresa)->max('id_categoria');
-
-       DB::table('categorias')->insert(
-        [
-        'id_empresa' => Auth::user()->id_empresa,
-        'id_categoria' => $categoriaid+1, 
-        'nombre' => $request->nombre,
-        'referencia' => $request->referencia,
-        'descripcion'=> $request->descripcion        
-        ]
-    );
-    return response('Categoria creada exitosamente',200);
     }
 
     //
