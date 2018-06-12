@@ -59,10 +59,14 @@ $app->group(['middleware' => 'auth:api'], function($app)
     $app->get('/api/chat/mensajes/{recibe}', 'ChatController@mensajes');
     $app->post('/api/chat/mensajes/guardar', 'ChatController@insertmsj');
     $app->post('/api/guardar/accesorios', 'FinderController@guardaraccesorio');
-    $app->post('/api/find/misaccesorios', 'FinderController@accesoriosyservicios');
+    $app->post('/api/find/accesoriosyservicios', 'FinderController@accesoriosyservicios');
     $app->get ('/api/find/misaccesorios/{id}', 'FinderController@misaccesorios');    
     $app->get('/api/find/accesorios2', 'FinderController@prueba');
-    
+
+
+    $app->post('/api/agregar/pedigree', 'PetsController@agregarpedigree');
+    $app->get ('/api/find/mispedigree/{id}', 'PetsController@mispedigree');    
+ 
 //    http://167.114.185.216/servicios54/public//api/find/accesorios
 //   $app->get('/api-material-categorias', 'CategoriaController@prueba');
 

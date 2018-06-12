@@ -65,62 +65,39 @@ public function mismascotas($id)
         return response(DB::table('mascotas')->where('id_usuario',$id)->get(),200);  
 }
 
-public function prueba()
-{
-    if(tienepermisos([6,7,8])){   
-       $categorias = DB::table('categorias')->select("id_categoria","nombre","referencia","descripcion")->where('id_empresa',5)->orderBy('id_categoria','DESC')->get();
-    if(count($categorias)>0){
-               return response($categorias,200);
-}else{
-    return response('No se encuentran Categorias registradas',204);
-      }
-
-    }else{
-        $key = "message.noautorizado";
-        return response(trans($key),401);  
-    }
-
-}
-    public function editarcategoria(Request $request)
-    {
-          if(tienepermisos([6,7])){   
-
+public function agregarpedigree(Request $request){
     $this->validate($request, [
-            'nombre' => 'required',
-            'id' => 'required'
-    ]);
-    $categoria=DB::table('categorias')->select('id','nombre')->where('id_empresa',Auth::user()->id_empresa)->where('id_categoria',$request->id)->first();
-    if($categoria->nombre==$request->nombre){
+        'nombre' => 'required',
+        'pedigree' => 'required',
+        'mascota_id' => 'required'
+        ]);
 
-    }else{
-    $validador=DB::table('categorias')->where('id_empresa',Auth::user()->id_empresa)->where('nombre',$request->nombre)->first();
-         if(($validador)){
-            $this->validate($request, [
-                'nombre' => 'required|unique:categorias,nombre',
-         ]);
-         }    
-       }
-       if(!$request->has('descripcion')){
-        $request->descripcion="";
-       }
-       if(!$request->has('referencia')){
-        $request->referencia="";
-       }
-       DB::table('categorias')->where('id',$categoria->id)->update(
-        [
-        'nombre' => $request->nombre,
-        'referencia' => $request->referencia,
-        'descripcion'=> $request->descripcion        
-        ]
-    );
-        $key = "message.categoriaeditada";
-        return response(trans($key),200);
+        DB::table('pedigree')->insert(
+            [
+        'usuario_id'=>Auth::user()->id,
+        'nombre'=>$request->nombre,
+        'pedigree'=>$request->pedigree,
+        'mascota_id'=>$request->mascota_id
+            ]
+        ); 
+        $nuevoitem=DB::table('pedigree')->where('id',DB::table('pedigree')->where('usuario_id',Auth::user()->id)->max('id'))->take(1)->get();
+        return response($nuevoitem,200);
+    
+}
+public function mispedigree($id){
 
-        }else{
-        $key = "message.noautorizado";
-        return response(trans($key),401);  
+    if($id==0){
+        $id=Auth::user()->id;
     }
-    }
+    $data=DB::table('pedigree')->crossJoin('mascotas', function ($join) {
+        $join->on('pedigree.mascota_id', '=', 'mascotas.id');
+    })->where('usuario_id',$id)->get();
+        return response($data,200);  
+    
+}
+
+
+
 
 }
 
