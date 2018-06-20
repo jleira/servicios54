@@ -69,15 +69,17 @@ public function agregarpedigree(Request $request){
     $this->validate($request, [
         'nombre' => 'required',
         'pedigree' => 'required',
-        'mascota_id' => 'required'
+        'mascota_id' => 'required',
+        'color' => 'required'
         ]);
 
         DB::table('pedigree')->insert(
             [
         'usuario_id'=>Auth::user()->id,
-        'nombre'=>$request->nombre,
+        'nombrepedigree'=>$request->nombre,
         'pedigree'=>$request->pedigree,
-        'mascota_id'=>$request->mascota_id
+        'mascota_id'=>$request->mascota_id,
+        'color_pedigree'=>$request->color
             ]
         ); 
         $nuevoitem=DB::table('pedigree')->where('id',DB::table('pedigree')->where('usuario_id',Auth::user()->id)->max('id'))->take(1)->get();
