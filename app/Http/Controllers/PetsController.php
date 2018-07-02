@@ -27,8 +27,7 @@ public function crearmascota(Request $request)
         'raza' => 'required',
         'color' => 'required',
         'microchip' => 'required',
-        'vender' =>'required',
-        'precio'=>'required'
+        'vender' =>'required'
         ]);
         $existemascota=0;
         $existemascota=DB::table('mascotas')->where('id_usuario',Auth::user()->id)->

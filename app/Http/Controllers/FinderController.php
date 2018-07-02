@@ -23,7 +23,7 @@ class FinderController extends Controller
     {
         $clave=$request->clave;
         $arrayexplode=explode(' ',$clave);
-         $results=DB::table('users')->select('id','first_name', 'last_name')->where(
+         $results=DB::table('users')->select('id','first_name', 'last_name','img')->where(
             function ($query) use($arrayexplode) {
                 for ($i = 0; $i < count($arrayexplode); $i++){
                    $query->orwhere('first_name', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id', [Auth::user()->id]);
@@ -44,7 +44,8 @@ class FinderController extends Controller
         $clave=$request->clave;
         $vender=$request->vender;
         $arrayexplode=explode(' ',$clave);
-         $results=DB::table('mascotas')->where(
+         $results=DB::table('mascotas as m')->join('users as u', 'u.id', '=', 'm.id_usuario')
+         ->select('m.*','u.first_name','u.last_name')->where(
             function ($query) use($arrayexplode,$vender) {
                 for ($i = 0; $i < count($arrayexplode); $i++){
                    $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id_usuario', [Auth::user()->id])->whereIn('vender',$vender);
@@ -123,7 +124,7 @@ public function accesoriosyservicios(Request $request)
         for ($i = 0; $i < count($arrayexplode); $i++){
            $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('usuario_id', [Auth::user()->id])->whereIn('categoria',$categoria);
         } 
-   })->select('productos.nombre','users.first_name','users.last_name','productos.categoria','productos.precio','productos.descripcion')->get();
+   })->select('productos.*','users.first_name','users.last_name')->get();
    $datos['datos']=$results;
      return response($datos,200); 
  

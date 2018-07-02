@@ -55,9 +55,15 @@ $app->group(['middleware' => 'auth:api'], function($app)
     $app->get('/api/follow/dejardeseguir/{id}', 'AuthController@dejardeseguir');
 
     $app->post('/api/find/mascotas', 'FinderController@mascotas');    
-    
+ 
+    $app->get('/api/chat/mensajes/usuario', 'ChatController@mischat');
+    $app->get('/api/chat/mensajes/eliminar/{id}', 'ChatController@eliminarchat');
+
     $app->get('/api/chat/mensajes/{recibe}', 'ChatController@mensajes');
     $app->post('/api/chat/mensajes/guardar', 'ChatController@insertmsj');
+    $app->post('/api/chat/mensajesmascota/guardar', 'ChatController@insertmsjmascota');
+
+
     $app->post('/api/guardar/accesorios', 'FinderController@guardaraccesorio');
     $app->post('/api/find/accesoriosyservicios', 'FinderController@accesoriosyservicios');
     $app->get ('/api/find/misaccesorios/{id}', 'FinderController@misaccesorios');    
