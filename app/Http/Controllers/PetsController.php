@@ -53,7 +53,17 @@ public function crearmascota(Request $request)
         'precio'=>$request->precio
             ]
         ); 
+        DB::table('pedigree')->insert(
+            [
+        'usuario_id'=>Auth::user()->id,
+        'nombrepedigree'=>$request->nombre,
+        'pedigree'=>'{"linea1":[{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1}],"linea2":[{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1}],"linea3":[{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1},{"nombre":"","imagen":"assets/img/mascota.png","caso":1}]}',
+        'mascota_id'=>DB::table('mascotas')->where('id_usuario',Auth::user()->id)->max('id'),
+        'color_pedigree'=>'#DEDEDE'
+            ]
+        ); 
         $macotanueva=DB::table('mascotas')->where('id',DB::table('mascotas')->where('id_usuario',Auth::user()->id)->max('id'))->take(1)->get();
+
         return response($macotanueva,200);
 }
 public function mismascotas($id)
