@@ -96,12 +96,15 @@ class AuthController extends Controller
         }
      $seguidores= DB::table('seguidores')->where('usuario_id',$id)->count();
      $seguidos=  DB::table('seguidores')->where('seguidor_id',$id)->count();
-     $nombre=  DB::table('users')->where('id',$id)->value('first_name').' '.DB::table('users')->where('id',$id)->value('last_name');
+     $nombre=  DB::table('users')->where('id',$id)->value('first_name');
+     $apell=   DB::table('users')->where('id',$id)->value('last_name');
      $ejemplares =DB::table('mascotas')->where('id_usuario',$id)->count();
      $losigo =DB::table('seguidores')->where('seguidor_id',Auth::user()->id)->count();
      $datos['seguidores']=$seguidores;
      $datos['seguidos']=$seguidos;
      $datos['nombre']=$nombre;
+     $datos['apell']=$apell;
+     
      $datos['ejemplares']=$ejemplares;
      $datos['losigo']=$losigo;
      

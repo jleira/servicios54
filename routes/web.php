@@ -19,7 +19,6 @@ $app->get('/auth/login', function () use ($app) {
 //Function to generate a random Key
 $app->get('/key', function() {
         $key = "message.categoriaguardada";
-
 	return trans($key);
 });
 
@@ -29,8 +28,9 @@ $app->get('api/empresasactivas','ExampleController@empresasactivas');
 $app->post('api/auth/register','AuthController@register');
 $app->post('/api/find/mascotas2', 'FinderController@mascotas2');    
 $app->post('/api/find/accesoriosyservicios2', 'FinderController@accesoriosyservicios2');
-
 $app->post('/api/upload/files', 'UploadfileController@prueba');    
+$app->post('/api/find/todo2', 'FinderController@todo2');    
+$app->get ('/api/find/pedigree/{id}', 'PetsController@mispedigree2');    
 
 
 
@@ -43,6 +43,7 @@ $app->group(['middleware' => 'auth:api'], function($app)
             'message' => 'Hello World!',
         ]);
     });
+    $app->post('/api/find/todo', 'FinderController@todo');    
     $app->get('/api/mydata', 'AuthController@mydata');
     $app->post('/api-material-guardarcategoria', 'CategoriaController@nuevacategoria');    
     $app->post('/api-material-editarcategoria', 'CategoriaController@editarcategoria');    
@@ -72,7 +73,7 @@ $app->group(['middleware' => 'auth:api'], function($app)
 
     $app->post('/api/agregar/pedigree', 'PetsController@agregarpedigree');
     $app->get ('/api/find/mispedigree/{id}', 'PetsController@mispedigree');    
- 
+// http://localhost/servicios54/public/api/find/mispedigree/0
 //    http://167.114.185.216/servicios54/public//api/find/accesorios
 //   $app->get('/api-material-categorias', 'CategoriaController@prueba');
 

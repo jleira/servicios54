@@ -161,12 +161,87 @@ public function misaccesorios($id)
         return response(DB::table('productos')->where('usuario_id',$id)->get(),200);  
 }
 
-public function prueba(){
-    $users = DB::table('users')
-            ->crossJoin('mensajes')
-            ->get();
-    return response($users);
-}
+public function todo2 (Request $request)
+{
+    $clave=$request->clave;
+    $arrayexplode=explode(' ',$clave);
+    $results['people']=[];
+    $results['mascotas']=DB::table('mascotas')->where(
+        function ($query) use($arrayexplode) {
+            for ($i = 0; $i < count($arrayexplode); $i++){
+               $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('vender',[1,2]);
+            } 
+       }
+     )->orWhere( function ($query) use($arrayexplode) {
+        for ($i = 0; $i < count($arrayexplode); $i++){
+           $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('vender',[1,2]);
+        } 
+     })->orWhere( function ($query) use($arrayexplode) {
+     for ($i = 0; $i < count($arrayexplode); $i++){
+       $query->orwhere('color', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('vender',[1,2]);
+     }})->get();
 
+     $results['productos']=DB::table('productos')->crossJoin('users', function ($join) {
+        $join->on('productos.usuario_id', '=', 'users.id');
+    })->where(
+        function ($query) use($arrayexplode) {
+            for ($i = 0; $i < count($arrayexplode); $i++){
+               $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%');
+            } 
+       }
+     )->orWhere( function ($query) use($arrayexplode) {
+        for ($i = 0; $i < count($arrayexplode); $i++){
+           $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%');
+        } 
+   })->select('productos.*','users.first_name','users.last_name')->get();
+
+   $datos['datos']=$results;
+   return response($datos,200); 
+
+}
+public function todo (Request $request)//usuarios conectados
+{
+    $clave=$request->clave;
+    $arrayexplode=explode(' ',$clave);
+     $results['people']=DB::table('users')->select('id','first_name', 'last_name','img')->where(
+        function ($query) use($arrayexplode) {
+            for ($i = 0; $i < count($arrayexplode); $i++){
+               $query->orwhere('first_name', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id', [Auth::user()->id]);
+            } 
+       }
+     )->orWhere( function ($query) use($arrayexplode) {
+        for ($i = 0; $i < count($arrayexplode); $i++){
+           $query->orwhere('last_name', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id', [Auth::user()->id]);
+        } 
+   })->get();
+
+   $results['mascotas']=DB::table('mascotas as m')->join('users as u', 'u.id', '=', 'm.id_usuario')
+         ->select('m.*','u.first_name','u.last_name')->where(
+            function ($query) use($arrayexplode) {
+                for ($i = 0; $i < count($arrayexplode); $i++){
+                   $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id_usuario', [Auth::user()->id])->whereIn('vender',[1,2]);
+                } 
+           }
+         )->orWhere( function ($query) use($arrayexplode) {
+            for ($i = 0; $i < count($arrayexplode); $i++){
+               $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id_usuario', [Auth::user()->id])->whereIn('vender',[1,2]);
+            } 
+       })->get();
+       $results['productos']=DB::table('productos')->crossJoin('users', function ($join) {
+          $join->on('productos.usuario_id', '=', 'users.id');
+      })->where(
+          function ($query) use($arrayexplode) {
+              for ($i = 0; $i < count($arrayexplode); $i++){
+                 $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('usuario_id', [Auth::user()->id]);
+              } 
+         }
+       )->orWhere( function ($query) use($arrayexplode) {
+          for ($i = 0; $i < count($arrayexplode); $i++){
+             $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('usuario_id', [Auth::user()->id]);
+          } 
+     })->select('productos.*','users.first_name','users.last_name')->get();
+     $datos['datos']=$results;
+     return response($datos,200);
+}
     //
 }

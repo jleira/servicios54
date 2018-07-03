@@ -72,29 +72,41 @@ public function agregarpedigree(Request $request){
         'color' => 'required'
         ]);
 
-        DB::table('pedigree')->insert(
-            [
-        'usuario_id'=>Auth::user()->id,
-        'nombrepedigree'=>$request->nombre,
-        'pedigree'=>$request->pedigree,
-        'mascota_id'=>$request->mascota_id,
-        'color_pedigree'=>$request->color
-            ]
-        ); 
-        $nuevoitem=DB::table('pedigree')->where('id',DB::table('pedigree')->where('usuario_id',Auth::user()->id)->max('id'))->take(1)->get();
+        if($request->has('pedigre_id')){
+            DB::table('pedigree')->where('id',$request->pedigre_id)->update(
+                ['nombrepedigree'=>$request->nombre,
+            'pedigree'=>$request->pedigree,
+            'color_pedigree'=>$request->color]
+            ); 
+            $nuevoitem[]=DB::table('pedigree')->where('id',$request->pedigre_id)->take(1)->get();    
+
+        }else{
+            DB::table('pedigree')->insert(
+                [
+            'usuario_id'=>Auth::user()->id,
+            'nombrepedigree'=>$request->nombre,
+            'pedigree'=>$request->pedigree,
+            'mascota_id'=>$request->mascota_id,
+            'color_pedigree'=>$request->color
+                ]
+            ); 
+            $nuevoitem=DB::table('pedigree')->where('id',DB::table('pedigree')->where('usuario_id',Auth::user()->id)->max('id'))->take(1)->get();    
+        }
         return response($nuevoitem,200);
     
 }
 public function mispedigree($id){
-
     if($id==0){
         $id=Auth::user()->id;
     }
-    $data=DB::table('pedigree')->crossJoin('mascotas', function ($join) {
-        $join->on('pedigree.mascota_id', '=', 'mascotas.id');
-    })->where('usuario_id',$id)->get();
+    $data=DB::table('pedigree as p')->join('mascotas as m', 'p.mascota_id', '=', 'm.id')->
+    select('p.id as pedigree_id','p.*','m.*')->where('p.usuario_id',$id)->get();
         return response($data,200);  
-    
+}
+public function mispedigree2($id){
+    $data=DB::table('pedigree as p')->join('mascotas as m', 'p.mascota_id', '=', 'm.id')->
+    select('p.id as pedigree_id','p.*','m.*')->where('p.mascota_id',$id)->get();
+        return response($data,200);  
 }
 
 
