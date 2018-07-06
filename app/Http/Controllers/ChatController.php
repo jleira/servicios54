@@ -87,6 +87,7 @@ class ChatController extends Controller
         'usuario_envia' => Auth::user()->id,
         'usuario_recibe' => $request->usuario_recibe, 
         'mensaje' => $request->mensaje,
+        'tipo' =>$request->tipo,
         'creado'=> $fecha
         ]
     );

@@ -44,6 +44,8 @@ $app->group(['middleware' => 'auth:api'], function($app)
         ]);
     });
     $app->post('/api/find/todo', 'FinderController@todo');    
+    $app->post('/api/find/todoseguidores', 'FinderController@todoseguidores');
+    
     $app->get('/api/mydata', 'AuthController@mydata');
     $app->post('/api-material-guardarcategoria', 'CategoriaController@nuevacategoria');    
     $app->post('/api-material-editarcategoria', 'CategoriaController@editarcategoria');    

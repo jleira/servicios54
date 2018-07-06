@@ -244,4 +244,45 @@ public function todo (Request $request)//usuarios conectados
      return response($datos,200);
 }
     //
+
+    public function todoseguidores (Request $request)//usuarios conectados
+{
+    $id_seguidos=[];
+    $resultsids=DB::table('seguidores')->select('usuario_id')->where('seguidor_id',Auth::user()->id)->get();
+
+    foreach ($resultsids as $item) {
+        $id_seguidos[]=$item->usuario_id;
+    }    
+     $clave=$request->clave;
+    $arrayexplode=explode(' ',$clave);
+     $results['people']=[];
+
+   $results['mascotas']=DB::table('mascotas as m')->join('users as u', 'u.id', '=', 'm.id_usuario')
+         ->select('m.*','u.first_name','u.last_name')->where(
+            function ($query) use($arrayexplode, $id_seguidos) {
+                for ($i = 0; $i < count($arrayexplode); $i++){
+                   $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('id_usuario',  $id_seguidos)->whereIn('vender',[1,2]);
+                } 
+           }
+         )->orWhere( function ($query) use($arrayexplode, $id_seguidos) {
+            for ($i = 0; $i < count($arrayexplode); $i++){
+               $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('id_usuario',  $id_seguidos)->whereIn('vender',[1,2]);
+            } 
+       })->get();
+       $results['productos']=DB::table('productos')->crossJoin('users', function ($join) {
+          $join->on('productos.usuario_id', '=', 'users.id');
+      })->where(
+          function ($query) use($arrayexplode, $id_seguidos) {
+              for ($i = 0; $i < count($arrayexplode); $i++){
+                 $query->orwhere('nombre', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('usuario_id',  $id_seguidos);
+              } 
+         }
+       )->orWhere( function ($query) use($arrayexplode , $id_seguidos) {
+          for ($i = 0; $i < count($arrayexplode); $i++){
+             $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('usuario_id',  $id_seguidos);
+          } 
+     })->select('productos.*','users.first_name','users.last_name')->get();
+     $datos['datos']=$results;
+     return response($datos,200);
+}
 }
