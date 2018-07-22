@@ -77,7 +77,7 @@ class AuthController extends Controller
                 'password' => app('hash')->make($request->password),
                 'first_name'=> $request->first_name,
                 'last_name'=> $request->last_name,
-                'img'      => 'app/public/usuario'
+                'img'      => 'public/usuario'
                 
                 ]
         ); 
