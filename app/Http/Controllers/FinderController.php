@@ -42,6 +42,11 @@ class FinderController extends Controller
     public function mascotas(Request $request)
     {
         $clave=$request->clave;
+        $inicial=1;
+        if($request->has('cantidad')){
+            $inicial=$request->cantidad;
+        }
+        $final=$inicial+9;
         $vender=$request->vender;
         $arrayexplode=explode(' ',$clave);
          $results=DB::table('mascotas as m')->join('users as u', 'u.id', '=', 'm.id_usuario')
@@ -55,14 +60,23 @@ class FinderController extends Controller
             for ($i = 0; $i < count($arrayexplode); $i++){
                $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id_usuario', [Auth::user()->id])->whereIn('vender',$vender);
             } 
-       })->get();
+       })->skip($inicial)->take($final-$inicial)->orderBy('id', 'desc')->get();
        $datos['datos']=$results;
-         return response($datos,200); 
-     
+       $datos['inicial']=$inicial;
+       $datos['final']=$final;
+
+         return response($datos,200);
     }
 
     public function mascotas2(Request $request)
     {
+        $clave=$request->clave;
+        $inicial=1;
+        if($request->has('cantidad')){
+            $inicial=$request->cantidad;
+        }
+        $final=$inicial+9;
+    
         $clave=$request->clave;
         $vender=$request->vender;
         $arrayexplode=explode(' ',$clave);
@@ -76,8 +90,11 @@ class FinderController extends Controller
             for ($i = 0; $i < count($arrayexplode); $i++){
                $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('vender',$vender);
             } 
-       })->get();
+       })->skip($inicial)->take($final-$inicial)->orderBy('id', 'desc')->get();
        $datos['datos']=$results;
+       $datos['final']=$final;
+       $datos['inicial']=$inicial;
+    
          return response($datos,200);      
     }
 public function guardaraccesorio(Request $request)
@@ -110,6 +127,11 @@ return response($productonuevo,200);
 public function accesoriosyservicios(Request $request)
 {
     $clave=$request->clave;
+    $inicial=1;
+    if($request->has('cantidad')){
+        $inicial=$request->cantidad;
+    }
+    $final=$inicial+9;
     $categoria=$request->categoria;
     $arrayexplode=explode(' ',$clave);
      $results=DB::table('productos')->crossJoin('users', function ($join) {
@@ -124,7 +146,7 @@ public function accesoriosyservicios(Request $request)
         for ($i = 0; $i < count($arrayexplode); $i++){
            $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('usuario_id', [Auth::user()->id])->whereIn('categoria',$categoria);
         } 
-   })->select('productos.*','users.first_name','users.last_name')->get();
+   })->select('productos.*','users.first_name','users.last_name')->skip($inicial)->take($final-$inicial)->orderBy('productos.id', 'desc')->get();
    $datos['datos']=$results;
      return response($datos,200); 
  
@@ -133,6 +155,11 @@ public function accesoriosyservicios(Request $request)
 public function accesoriosyservicios2(Request $request)
 {
     $clave=$request->clave;
+    $inicial=1;
+    if($request->has('cantidad')){
+        $inicial=$request->cantidad;
+    }
+    $final=$inicial+9;
     $categoria=$request->categoria;
     $arrayexplode=explode(' ',$clave);
      $results=DB::table('productos')->crossJoin('users', function ($join) {
@@ -147,10 +174,9 @@ public function accesoriosyservicios2(Request $request)
         for ($i = 0; $i < count($arrayexplode); $i++){
            $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('categoria',$categoria);
         } 
-   })->select('productos.*','users.first_name','users.last_name')->get();
+   })->skip($inicial)->take($final-$inicial)->orderBy('productos.id', 'desc')->select('productos.*','users.first_name','users.last_name')->get();
    $datos['datos']=$results;
      return response($datos,200); 
- 
 }
 
 public function misaccesorios($id)
@@ -164,6 +190,22 @@ public function misaccesorios($id)
 public function todo2 (Request $request)
 {
     $clave=$request->clave;
+    $inicial1=1;
+    $inicial2=1;
+    $inicial3=1;
+    if($request->has('cantidad1')){
+        $inicial1=$request->cantidad1;
+    }
+    if($request->has('cantidad2')){
+        $inicial2=$request->cantidad2;
+    }
+    if($request->has('cantidad3')){
+        $inicial3=$request->cantidad3;
+    }
+    $final1=$inicial1+9;
+    $final2=$inicial2+9;
+    $final3=$inicial3+9;
+    
     $arrayexplode=explode(' ',$clave);
     $results['people']=[];
     $results['mascotas']=DB::table('mascotas')->where(
@@ -179,7 +221,7 @@ public function todo2 (Request $request)
      })->orWhere( function ($query) use($arrayexplode) {
      for ($i = 0; $i < count($arrayexplode); $i++){
        $query->orwhere('color', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('vender',[1,2]);
-     }})->get();
+     }})->skip($inicial1)->take($final1-$inicial1)->orderBy('id', 'desc')->get();
 
      $results['productos']=DB::table('productos')->crossJoin('users', function ($join) {
         $join->on('productos.usuario_id', '=', 'users.id');
@@ -193,15 +235,33 @@ public function todo2 (Request $request)
         for ($i = 0; $i < count($arrayexplode); $i++){
            $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%');
         } 
-   })->select('productos.*','users.first_name','users.last_name')->get();
+   })->select('productos.*','users.first_name','users.last_name')->skip($inicial3)->take($final3-$inicial3)->orderBy('id', 'desc')->get();
 
    $datos['datos']=$results;
+   $datos['final']=$final1;
+   $datos['inicial']=$inicial1;
+   
    return response($datos,200); 
 
 }
 public function todo (Request $request)//usuarios conectados
 {
     $clave=$request->clave;
+    $inicial1=1;
+    $inicial2=1;
+    $inicial3=1;
+    if($request->has('cantidad1')){
+        $inicial1=$request->cantidad1;
+    }
+    if($request->has('cantidad2')){
+        $inicial2=$request->cantidad2;
+    }
+    if($request->has('cantidad3')){
+        $inicial3=$request->cantidad3;
+    }
+    $final1=$inicial1+9;
+    $final2=$inicial2+9;
+    $final3=$inicial3+9;
     $arrayexplode=explode(' ',$clave);
      $results['people']=DB::table('users')->select('id','first_name', 'last_name','img')->where(
         function ($query) use($arrayexplode) {
@@ -213,7 +273,7 @@ public function todo (Request $request)//usuarios conectados
         for ($i = 0; $i < count($arrayexplode); $i++){
            $query->orwhere('last_name', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id', [Auth::user()->id]);
         } 
-   })->get();
+   })->skip($inicial2)->take($final2-$inicial2)->orderBy('id', 'desc')->get();
 
    $results['mascotas']=DB::table('mascotas as m')->join('users as u', 'u.id', '=', 'm.id_usuario')
          ->select('m.*','u.first_name','u.last_name')->where(
@@ -226,7 +286,8 @@ public function todo (Request $request)//usuarios conectados
             for ($i = 0; $i < count($arrayexplode); $i++){
                $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('id_usuario', [Auth::user()->id])->whereIn('vender',[1,2]);
             } 
-       })->get();
+       })->skip($inicial1)->take($final1-$inicial1)->orderBy('id', 'desc')->get();
+
        $results['productos']=DB::table('productos')->crossJoin('users', function ($join) {
           $join->on('productos.usuario_id', '=', 'users.id');
       })->where(
@@ -239,7 +300,7 @@ public function todo (Request $request)//usuarios conectados
           for ($i = 0; $i < count($arrayexplode); $i++){
              $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%')->whereNotIn('usuario_id', [Auth::user()->id]);
           } 
-     })->select('productos.*','users.first_name','users.last_name')->get();
+     })->select('productos.*','users.first_name','users.last_name')->skip($inicial3)->take($final3-$inicial3)->orderBy('productos.id', 'desc')->get();
      $datos['datos']=$results;
      return response($datos,200);
 }
@@ -247,9 +308,24 @@ public function todo (Request $request)//usuarios conectados
 
     public function todoseguidores (Request $request)//usuarios conectados
 {
+    $inicial1=1;
+    $inicial2=1;
+    $inicial3=1;
+    if($request->has('cantidad1')){
+        $inicial1=$request->cantidad1;
+    }
+    if($request->has('cantidad2')){
+        $inicial2=$request->cantidad2;
+    }
+    if($request->has('cantidad3')){
+        $inicial3=$request->cantidad3;
+    }
+    $final1=$inicial1+9;
+    $final2=$inicial2+9;
+    $final3=$inicial3+9;
+
     $id_seguidos=[];
     $resultsids=DB::table('seguidores')->select('usuario_id')->where('seguidor_id',Auth::user()->id)->get();
-
     foreach ($resultsids as $item) {
         $id_seguidos[]=$item->usuario_id;
     }    
@@ -268,7 +344,7 @@ public function todo (Request $request)//usuarios conectados
             for ($i = 0; $i < count($arrayexplode); $i++){
                $query->orwhere('raza', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('id_usuario',  $id_seguidos)->whereIn('vender',[1,2]);
             } 
-       })->get();
+       })->skip($inicial3)->take($final3-$inicial3)->orderBy('m.id', 'desc')->get();
        $results['productos']=DB::table('productos')->crossJoin('users', function ($join) {
           $join->on('productos.usuario_id', '=', 'users.id');
       })->where(
@@ -281,7 +357,7 @@ public function todo (Request $request)//usuarios conectados
           for ($i = 0; $i < count($arrayexplode); $i++){
              $query->orwhere('descripcion', 'like',  '%' . $arrayexplode[$i] .'%')->whereIn('usuario_id',  $id_seguidos);
           } 
-     })->select('productos.*','users.first_name','users.last_name')->get();
+     })->select('productos.*','users.first_name','users.last_name')->skip($inicial3)->take($final3-$inicial3)->orderBy('productos.id', 'desc')->get();
      $datos['datos']=$results;
      return response($datos,200);
 }

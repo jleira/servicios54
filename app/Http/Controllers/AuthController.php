@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Tymon\JWTAuth\JWTAuth;
 use Auth;
 use DB;
+use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     /**
@@ -68,14 +69,6 @@ class AuthController extends Controller
             'password' => 'required|confirmed|min:6',
             "first_name"=> 'required',
             "last_name"=> 'required',
-//            "gender"=> 'required',
-//            "birthday"=> 'required',
-//            "phone"=> 'required',
-//            "cellphone"=> 'required',
-//            "address"=> 'required',
-//            "city"=> 'required',
-//            "province"=> 'required',
-//            "country"=> 'required',
         ]);
 
          DB::table('users')->insert(
@@ -83,7 +76,10 @@ class AuthController extends Controller
                 'email' => $request->email, 
                 'password' => app('hash')->make($request->password),
                 'first_name'=> $request->first_name,
-                'last_name'=> $request->last_name]
+                'last_name'=> $request->last_name,
+                'img'      => 'app/public/usuario'
+                
+                ]
         ); 
 
         return $this->login($request);
@@ -98,12 +94,14 @@ class AuthController extends Controller
      $seguidos=  DB::table('seguidores')->where('seguidor_id',$id)->count();
      $nombre=  DB::table('users')->where('id',$id)->value('first_name');
      $apell=   DB::table('users')->where('id',$id)->value('last_name');
+     $img=   DB::table('users')->where('id',$id)->value('img');
      $ejemplares =DB::table('mascotas')->where('id_usuario',$id)->count();
      $losigo =DB::table('seguidores')->where('seguidor_id',Auth::user()->id)->count();
      $datos['seguidores']=$seguidores;
      $datos['seguidos']=$seguidos;
      $datos['nombre']=$nombre;
      $datos['apell']=$apell;
+     $datos['img']=$img;
      
      $datos['ejemplares']=$ejemplares;
      $datos['losigo']=$losigo;
@@ -145,6 +143,29 @@ class AuthController extends Controller
             return response('Ud no sigue a este usuario',419);
         }
 
+    }
+    public function cambiarpass(Request $request)
+    {
+        $this->validate($request, [
+            'pass'    => 'required|min:6',
+            'newpass' => 'required|min:6|confirmed',
+        ]);
+
+        $pass=DB::table('users')->where('id',Auth::user()->id)->value('password');
+         if (Hash::check($request->pass, $pass)) {
+             DB::table('users')->update(
+                [
+                'password' => Hash::make($request->newpass)
+                ]
+            );             
+            return response('las contraseñas coinciden: '.Hash::make('1234567'),200);
+        }else{
+            return response([
+                'mensaje' => 'la contraseña no coincide',
+             ],401);            
+        }
+ 
+    return response($pass,200);
     }
 
 

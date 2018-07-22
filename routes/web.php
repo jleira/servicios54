@@ -32,7 +32,7 @@ $app->post('/api/upload/files', 'UploadfileController@prueba');
 $app->post('/api/find/todo2', 'FinderController@todo2');    
 $app->get ('/api/find/pedigree/{id}', 'PetsController@mispedigree2');    
 
-
+ 
 
 
 //GRoup with protection to login users.
@@ -72,6 +72,7 @@ $app->group(['middleware' => 'auth:api'], function($app)
     $app->get ('/api/find/misaccesorios/{id}', 'FinderController@misaccesorios');    
     $app->get('/api/find/accesorios2', 'FinderController@prueba');
 
+    $app->post('api/auth/cambiarpass', 'AuthController@cambiarpass');
 
     $app->post('/api/agregar/pedigree', 'PetsController@agregarpedigree');
     $app->get ('/api/find/mispedigree/{id}', 'PetsController@mispedigree');    
