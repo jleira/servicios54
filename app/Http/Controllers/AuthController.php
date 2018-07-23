@@ -167,6 +167,23 @@ class AuthController extends Controller
  
     return response($pass,200);
     }
+    public function cambiarps()
+    {
+        return view('admin.index',['mensaje' => '']);
+    }
+    public function reset(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email',
+        ]);
+        $existe=DB::table('users')->where('email',$request->email)->count();
+        if($existe){
+            return view('admin.index',['mensaje' => 'Se ha enviado un correo con los pasos para recuperar la contraseña']);
+        }else{
+            return view('admin.index',['mensaje' => 'No existe este correo registrado']);
+        }
+
+    }
 
 
 }

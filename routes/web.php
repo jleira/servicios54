@@ -31,8 +31,10 @@ $app->post('/api/find/accesoriosyservicios2', 'FinderController@accesoriosyservi
 $app->post('/api/upload/files', 'UploadfileController@prueba');    
 $app->post('/api/find/todo2', 'FinderController@todo2');    
 $app->get ('/api/find/pedigree/{id}', 'PetsController@mispedigree2');    
+$app->get ('/passwordrecovery', 'AuthController@cambiarps');    
+$app->post('/resetpass', 'AuthController@reset');    
 
- 
+
 
 
 //GRoup with protection to login users.
