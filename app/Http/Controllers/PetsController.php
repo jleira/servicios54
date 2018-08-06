@@ -30,6 +30,22 @@ public function crearmascota(Request $request)
         'vender' =>'required'
         ]);
         $existemascota=0;
+        if($request->id){    
+            DB::table('mascotas')->where('id',$request->id)->update([
+            'nombre'=>$request->nombre,
+            'sexo'=>$request->sexo,
+            'raza'=>$request->raza,
+            'color'=>$request->color,
+            'microchip'=>$request->microchip,
+            'vender'=>$request->vender,
+            'precio'=>$request->precio
+                ]); 
+    
+            $macotanueva=DB::table('mascotas')->where('id',$request->id)->get();
+            return response($macotanueva,200);
+
+        }
+
         $existemascota=DB::table('mascotas')->where('id_usuario',Auth::user()->id)->
         where('nombre',$request->nombre)->
         where('sexo',$request->sexo)->
