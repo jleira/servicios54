@@ -97,7 +97,7 @@ class FinderController extends Controller
     
          return response($datos,200);      
     }
-public function guardaraccesorio(Request $request)
+public function guardaraccesorio(Request $request) 
 {
     $this->validate($request, [
         'nombre' => 'required',
@@ -105,8 +105,21 @@ public function guardaraccesorio(Request $request)
         'precio'=>'required',
         'descripcion'=>'present'
     ]);
+    if($request->id){    
+        DB::table('productos')->where('id',$request->id)->update([
+        'nombre'=>$request->nombre,
+        'categoria'=>$request->categoria,
+        'descripcion'=>$request->descripcion,
+        'precio'=>$request->precio
+            ]); 
+    $productonuevo=DB::table('productos')->where('id',$request->id)->get();
+    return response($productonuevo,200);
+            
+    }
 
     $fecha=carbon::now('America/Bogota')->toDateTimeString();
+
+
 
 DB::table('productos')->insert(
     [
@@ -360,5 +373,22 @@ public function todo (Request $request)//usuarios conectados
      })->select('productos.*','users.first_name','users.last_name')->skip($inicial3)->take($final3-$inicial3)->orderBy('productos.id', 'desc')->get();
      $datos['datos']=$results;
      return response($datos,200);
+}
+public function eliminarproducto(Request $request)
+{
+    $this->validate($request, [
+        'id' => 'required',
+        ]);
+        $existemascota=0;
+        if($request->id){    
+            DB::table('productos')->where('id',$request->id)->update([
+            'estado'=>2
+            ]);     
+            return response('OK',200);
+        }else{
+            return response('Error, debe definir el producto que eliminara',200);
+
+        }
+
 }
 }

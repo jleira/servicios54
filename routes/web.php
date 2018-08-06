@@ -88,6 +88,7 @@ $app->group(['middleware' => 'auth:api'], function($app)
     $app->post('/api/fotousuario', 'UploadfileController@fotousuario');
     $app->post('/api/pruebab64', 'UploadfileController@pruebab64');
 
+    $app->post('/api/productos/eliminar', 'FinderController@eliminarproducto');    
 
 
 // http://localhost/servicios54/public/api/find/mispedigree/0
