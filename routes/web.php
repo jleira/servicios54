@@ -60,7 +60,8 @@ $app->group(['middleware' => 'auth:api'], function($app)
     $app->get('/api/follow/dejardeseguir/{id}', 'AuthController@dejardeseguir');
 
     $app->post('/api/find/mascotas', 'FinderController@mascotas');    
- 
+    $app->post('/api/mascotas/eliminar', 'PetsController@eliminar');    
+    
     $app->get('/api/chat/mensajes/usuario', 'ChatController@mischat');
     $app->get('/api/chat/mensajes/eliminar/{id}', 'ChatController@eliminarchat');
 

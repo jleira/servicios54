@@ -87,7 +87,7 @@ public function mismascotas($id)
     if($id==0){
         $id=Auth::user()->id;
     }
-        return response(DB::table('mascotas')->where('id_usuario',$id)->get(),200);  
+        return response(DB::table('mascotas')->where('id_usuario',$id)->where('estado',1)->get(),200);  
 }
 
 public function agregarpedigree(Request $request){
@@ -126,15 +126,38 @@ public function mispedigree($id){
         $id=Auth::user()->id;
     }
     $data=DB::table('pedigree as p')->join('mascotas as m', 'p.mascota_id', '=', 'm.id')->
-    select('p.id as pedigree_id','p.*','m.*')->where('p.usuario_id',$id)->get();
+    select('p.id as pedigree_id','p.*','m.*')->where('p.usuario_id',$id)->where('m.estado',1)->get();
         return response($data,200);  
 }
 public function mispedigree2($id){
     $data=DB::table('pedigree as p')->join('mascotas as m', 'p.mascota_id', '=', 'm.id')->
-    select('p.id as pedigree_id','p.*','m.*')->where('p.mascota_id',$id)->get();
+    select('p.id as pedigree_id','p.*','m.*')->where('p.mascota_id',$id)->where('m.estado',1)->get();
         return response($data,200);  
 }
 
+
+public function eliminar(Request $request)
+{
+    $this->validate($request, [
+        'nombre' => 'required',
+        'sexo' => 'required',
+        'raza' => 'required',
+        'color' => 'required',
+        'microchip' => 'required',
+        'vender' =>'required'
+        ]);
+        $existemascota=0;
+        if($request->id){    
+            DB::table('mascotas')->where('id',$request->id)->update([
+            'estado'=>2
+            ]);     
+            return response('OK',200);
+        }else{
+            return response('Error, debe definir la mascota que eliminara',200);
+
+        }
+
+}
 
 
 
