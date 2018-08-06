@@ -10,7 +10,8 @@
         "vlucas/phpdotenv": "~2.2",
         "tymon/jwt-auth": "^1.0@dev",
         "nesbot/carbon": "^1.29",
-        "illuminate/cache": "5.4.*"
+        "illuminate/cache": "5.4.*",
+        "league/flysystem": " ~1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -36,7 +36,7 @@ $app->post('/resetpass', 'AuthController@reset');
 
 
 
-
+ 
 //GRoup with protection to login users.
 $app->group(['middleware' => 'auth:api'], function($app)
 {
@@ -44,7 +44,7 @@ $app->group(['middleware' => 'auth:api'], function($app)
         return response()->json([
             'message' => 'Hello World!',
         ]);
-    });
+    }); 
     $app->post('/api/find/todo', 'FinderController@todo');    
     $app->post('/api/find/todoseguidores', 'FinderController@todoseguidores');
     
@@ -78,6 +78,17 @@ $app->group(['middleware' => 'auth:api'], function($app)
 
     $app->post('/api/agregar/pedigree', 'PetsController@agregarpedigree');
     $app->get ('/api/find/mispedigree/{id}', 'PetsController@mispedigree');    
+
+    $app->get('/api/user', 'UserController@getAuthUser');
+    $app->post('/api/photoupload', 'UploadfileController@uploadfile');
+    $app->post('/api/photouploadaccesorio', 'UploadfileController@uploadfile2');
+    $app->post('/api/photouploadpedigree', 'UploadfileController@uploadfile3');
+    $app->post('/api/fotochat', 'UploadfileController@fotochat');
+    $app->post('/api/fotousuario', 'UploadfileController@fotousuario');
+    $app->post('/api/pruebab64', 'UploadfileController@pruebab64');
+
+
+
 // http://localhost/servicios54/public/api/find/mispedigree/0
 //    http://167.114.185.216/servicios54/public//api/find/accesorios
 //   $app->get('/api-material-categorias', 'CategoriaController@prueba');
