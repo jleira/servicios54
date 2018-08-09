@@ -40,7 +40,7 @@ class ChatController extends Controller
             'usuario_recibe' => 'required',
             'mensaje' => 'required'
     ]);
-    $fecha=carbon::now('America/Bogota')->toDateTimeString();
+    $fecha=carbon::now()->toDateTimeString();
     $id=0;
     if($request->has('id')){
         $id=$request->id;
@@ -111,7 +111,7 @@ where('usuario1',Auth::user()->id)->Orwhere('usuario2',Auth::user()->id)->orderb
     public function eliminarchat($id)
     {
         $datos=DB::table('chat')->where('id',$id)->get()->last();
-        $fecha=carbon::now('America/Bogota')->toDateTimeString();
+        $fecha=carbon::now()->toDateTimeString();
         if($datos->usuario1==Auth::user()->id){
             DB::table('chat')
             ->where('id', $id)
@@ -137,7 +137,7 @@ where('usuario1',Auth::user()->id)->Orwhere('usuario2',Auth::user()->id)->orderb
             'id_usuario' => 'required',
             'mensaje' => 'required'
     ]);
-    $fecha=carbon::now('America/Bogota')->toDateTimeString();
+    $fecha=carbon::now()->toDateTimeString();
     $id=0;
    
     if($id==0){
